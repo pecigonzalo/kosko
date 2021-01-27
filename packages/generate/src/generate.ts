@@ -1,6 +1,6 @@
 import { requireDefault } from "@kosko/require";
 import Debug from "debug";
-import glob from "fast-glob";
+import glob, { FileSystemAdapter } from "fast-glob";
 import { join } from "path";
 import { Result, Manifest } from "./base";
 import { ValidationError } from "./error";
@@ -28,6 +28,11 @@ export interface GenerateOptions {
    * Validate components.
    */
   validate?: boolean;
+
+  /**
+   * File system.
+   */
+  fs?: FileSystemAdapter;
 }
 
 async function getComponentValue(id: string): Promise<unknown> {
@@ -123,7 +128,8 @@ export async function generate(options: GenerateOptions): Promise<Result> {
 
   const ids = await glob(patterns, {
     cwd: options.path,
-    onlyFiles: false
+    onlyFiles: false,
+    fs: options.fs
   });
   debug("Found components", ids);
 
